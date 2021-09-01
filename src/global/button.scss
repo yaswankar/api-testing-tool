@@ -16,6 +16,38 @@
     border-radius: .25rem;
     transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
 }
+.btn-outline-danger {
+    color: #DC3545;
+    background-color: #fff;
+    border-color: #DC3545;
+    &:hover {
+        color: #fff;
+        background-color: #DC3545;
+        border-color: #DC3545;
+    }
+    &:focus {
+        color: #fff;
+        background-color: #DC3545;
+        border-color: #DC3545;
+        box-shadow: 0 0 0 0.25rem rgb(215, 48, 56, 50%);
+    } 
+}
+.btn-outline-success {
+    color: #198754;
+    background-color: #fff;
+    border-color: #198754;
+    &:hover {
+        color: #fff;
+        background-color: #198754;
+        border-color: #198754;
+    }
+    &:focus {
+        color: #fff;
+        background-color: #198754;
+        border-color: #198754;
+        box-shadow: 0 0 0 0.25rem rgb(25, 135, 84, 50%);
+    } 
+}
 .btn-primary {
     color: #fff;
     background-color: #0d6efd;
