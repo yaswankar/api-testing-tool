@@ -10,13 +10,18 @@
         <div class="params-row" v-for="(param, index) in paramsLocal" :key="index">
             <input class="standard-input key-input" placeholder="Key" v-model="param.key"/>
             <input class="standard-input value-input" placeholder="Value" type="text" v-model="param.value" />
-            <button class="btn btn-outline-danger remove" @click="$emit('delete-row', index)">REMOVE</button>
+            <button type="button" class="btn btn-outline-danger remove" @click="$emit('delete-row', { page: 'params_array', index})">REMOVE</button>
         </div>
-        <button class="btn btn-outline-success add" @click="$emit('insert-row')">ADD</button>
+        <button type="button" class="btn btn-outline-success add" @click="$emit('insert-row', 'params_array')">ADD</button>
     </div>
 
     <div v-if="activeTab.headers" id="headers" class="tabcontent">
-        Headers
+        <div class="headers-row" v-for="(header, index) in headersLocal" :key="index">
+            <input class="standard-input key-input" placeholder="Key" v-model="header.key"/>
+            <input class="standard-input value-input" placeholder="Value" type="text" v-model="header.value" />
+            <button type="button" class="btn btn-outline-danger remove" @click="$emit('delete-row', { page: 'headers_array', index})">REMOVE</button>
+        </div>
+        <button type="button" class="btn btn-outline-success add" @click="$emit('insert-row', 'headers_array')">ADD</button>
     </div>
 
     <div v-if="activeTab.json" id="json" class="tabcontent">
@@ -38,11 +43,16 @@ export default {
                 headers: false,
                 json: false
             },
-            paramsLocal: []
+            paramsLocal: [],
+            headersLocal: []
         }
     },
     props: {
         params: {
+            type: Array,
+            default: () => {[]}
+        }, 
+        headers: {
             type: Array,
             default: () => {[]}
         }
@@ -62,7 +72,25 @@ export default {
         },
         paramsLocal: {
             handler(newVal) {
-                this.$emit('params-change', newVal)
+                this.$emit('attrs-change', { newVal, page: 'params_array'})
+            },
+            deep: true
+        },
+        headers: {
+            immediate: true,
+            handler(headersFromProps) {
+                if(headersFromProps) {
+                    if(headersFromProps.length !== this.headersLocal.length) this.headersLocal = _.cloneDeep(headersFromProps)
+                    else {
+                        const isDiff = this.compareTwoSets(headersFromProps, this.headersLocal);
+                        if(isDiff) _.cloneDeep(headersFromProps);
+                    }
+                }
+            }
+        },
+        headersLocal: {
+            handler(newVal) {
+                this.$emit('attrs-change', { newVal, page: 'headers_array'})
             },
             deep: true
         }
@@ -87,7 +115,7 @@ export default {
 .nav-tabs {
     display: flex;
     width: 100%;
-    margin-top: 10px;
+    margin-top: 20px;
     /* Style tab links */
     .tablink {
     color: #444;
@@ -124,7 +152,7 @@ export default {
     border-top: none;
     max-height: calc(100% - 90px);
     overflow: auto;
-    .params-row {
+    .params-row, .headers-row {
         width: 100%;
         padding: 10px 15px;
         box-sizing: border-box;
