@@ -14,14 +14,14 @@
             </div>
             <tab-section :params="params_array" :headers="headers_array" @attrs-change="handleAttrsChange" @delete-row="handleRowDeletion" @insert-row="handleRowInsertion" />
         </form>
-        <response-section :headersContent="responseHeaders" :responseDetails="responseDetails"/>
+        <response-section :headersContent="responseHeaders" :responseDetails="responseDetails" :responseBody="responseData"/>
       </div>
 </template>
 <script>
 import TabSection from "./TabSection";
 import ResponseSection from "./ResponseSection";
 import axios from "axios";
-// import prettyBytes from 'pretty-bytes'
+import prettyBytes from 'pretty-bytes';
 const _ = require("lodash");
 
 export default {
@@ -35,7 +35,8 @@ export default {
             paramsObject: {},
             headersObject: {},
             responseHeaders: {},
-            responseDetails: {}
+            responseDetails: {},
+            responseData: null
         };
     },
     components: {
@@ -54,6 +55,7 @@ export default {
     },
     methods: {
         handleSubmit() {
+            const startTime = new Date().getTime();
             axios({
                 url: this.request_url,
                 method: this.request_type,
@@ -61,9 +63,9 @@ export default {
                 headers: this.headersObject
             }).then(response => {
                 console.log('Response', response);
-                // this.updateResponseEditor(response.data);
                 this.updateResponseHeaders(response.headers);
-                // this.updateResponseDetails(response);
+                this.updateResponseDetails(response, startTime);
+                this.responseData = response.data;
             }).catch(e => e.response);
         },
         // updateEndTime(response) {
@@ -75,14 +77,14 @@ export default {
         updateResponseHeaders(headers) {
             this.responseHeaders = headers;
         },
-        // updateResponseDetails(response) {
-        //     this.responseDetails.status = response.status;
-        //     this.responseDetails.time = response.customData.time;
-        //     this.responseDetails.size = prettyBytes(
-        //         JSON.stringify(response.data).length +
-        //         JSON.stringify(response.headers).length
-        //     )
-        // },
+        updateResponseDetails(response, hitTime) {
+            this.responseDetails.status = response.status;
+            this.responseDetails.time = new Date().getTime() - hitTime;
+            this.responseDetails.size = prettyBytes(
+                JSON.stringify(response.data).length +
+                JSON.stringify(response.headers).length
+            )
+        },
         handleRowDeletion(args) {
             this[args.page].splice(args.index, 1);
             if(args.page === 'params_array') this.handleAttrsChange({newVal : this[args.page], page: 'params_array'});

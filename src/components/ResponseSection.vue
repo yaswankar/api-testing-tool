@@ -2,16 +2,18 @@
     <div class="response-main">
         <h3>Response</h3>
         <div class="details">
-          <div class="status">Status: <span>200</span></div>
-          <div class="time">Time: <span>10</span>ms</div>
-          <div class="size">Size: <span>180</span></div>
+          <div class="status">Status: <span>{{responseDetails.status}}</span></div>
+          <div class="time">Time: <span>{{responseDetails.time}}</span>ms</div>
+          <div class="size">Size: <span>{{responseDetails.size}}</span></div>
         </div>
         <div class="response-nav-tabs">
                 <div class="tablink" :class="{'active-tab': activeTab.body, 'inactive-tab': !activeTab.body}" @click="openPage('body')">Body</div>
                 <div class="tablink" :class="{'active-tab': activeTab.headers, 'inactive-tab': !activeTab.headers}" @click="openPage('headers')">Headers</div>
                 <div>&nbsp;</div>
         </div>
-        <div v-if="activeTab.body" id="response-body" class="tabcontent"></div>
+        <div v-if="activeTab.body" id="response-body" class="tabcontent">
+            <codemirror v-model="responseBody" :options="cmOptions"></codemirror>
+        </div>
         <div v-if="activeTab.headers" id="response-headers" class="tabcontent">
            <div v-for="(value, Key) in getHeaders" :key="Key" class="header-row">
                <div>{{Key}}</div>
@@ -23,6 +25,10 @@
 </template>
 
 <script>
+// import setupEditors from "./EditorSetup/index";
+import { codemirror } from 'vue-codemirror';
+import 'codemirror/lib/codemirror.css';
+
 export default {
     name: 'response-section',
     data() {
@@ -31,6 +37,16 @@ export default {
                 body: true,
                 headers: false,
             },
+            cmOptions: {
+                // codemirror options
+                tabSize: 2,
+                readOnly: true,
+                mode: {name: "javascript", json: true},
+                theme: 'base16-dark',
+                lineNumbers: true,
+                line: true,
+                // more codemirror options, 更多 codemirror 的高级配置...
+            }
         }
     },
     props: {
@@ -41,7 +57,23 @@ export default {
         headersContent: {
             type: Object,
             default: () => {}
+        },
+        responseBody: {
+            type: Object,
+            default: () => {}
         }
+    },
+    components: {
+        codemirror
+    },
+    watch: {
+        // responseBody: {
+        //     handler(newVal) {
+        //         // const {updateResponseEditor} = setupEditors();
+        //         // updateResponseEditor(newVal);
+        //     },
+        //     deep: true
+        // }
     },
     computed: {
         getHeaders() {
@@ -49,10 +81,10 @@ export default {
         }
     },
     methods: {
-    openPage(pageName) {
-            Object.keys(this.activeTab).forEach(key => this.activeTab[key] = false)
-            this.activeTab[pageName] = true;
-    },
+        openPage(pageName) {
+                Object.keys(this.activeTab).forEach(key => this.activeTab[key] = false)
+                this.activeTab[pageName] = true;
+        },
     }
 }
 </script>
