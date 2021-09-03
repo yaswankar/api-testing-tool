@@ -14,7 +14,7 @@
             </div>
             <tab-section :params="params_array" :headers="headers_array" @attrs-change="handleAttrsChange" @delete-row="handleRowDeletion" @insert-row="handleRowInsertion" />
         </form>
-        <response-section :headersContent="responseHeaders" :responseDetails="responseDetails" :responseBody="responseData"/>
+        <response-section :headersContent="responseHeaders" :responseDetails="responseDetails" :responseBody="responseData ? colorize(JSON.stringify(responseData, null, 2)) : ''"/>
       </div>
 </template>
 <script>
@@ -39,41 +39,29 @@ export default {
             responseData: null
         };
     },
+    computed: {
+        getJSON() {
+            return this.responseData ? JSON.stringify(this.responseData, null, 2) : ''
+        }
+    },
     components: {
         TabSection,
         ResponseSection
-    },
-    mounted() {
-        // axios.interceptors.request.use(request => {
-        //     request.customData = request.customeData || {};
-        //     request.customData.startTime = new Date().getTime();
-        //     return request;
-        // });
-        // axios.interceptors.response.use(e => {
-        //     Promise.reject(this.updateEndTime(e.response));
-        // })
     },
     methods: {
         handleSubmit() {
             const startTime = new Date().getTime();
             axios({
-                url: this.request_url,
+                url: this.request_url, // https://get.geojs.io/v1/ip/country.json?ip=8.8.8.8
                 method: this.request_type,
                 params: this.paramsObject,
                 headers: this.headersObject
             }).then(response => {
-                console.log('Response', response);
                 this.updateResponseHeaders(response.headers);
                 this.updateResponseDetails(response, startTime);
                 this.responseData = response.data;
             }).catch(e => e.response);
         },
-        // updateEndTime(response) {
-        //     response.customData = response.customData || {}
-        //     response.customData.time =
-        //         new Date().getTime() - response.config.customData.startTime
-        //     return response;
-        // },
         updateResponseHeaders(headers) {
             this.responseHeaders = headers;
         },

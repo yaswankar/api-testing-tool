@@ -59,7 +59,7 @@ export default {
             default: () => {}
         },
         responseBody: {
-            type: Object,
+            type: String,
             default: () => {}
         }
     },
