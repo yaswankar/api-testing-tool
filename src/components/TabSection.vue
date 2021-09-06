@@ -4,7 +4,7 @@
         <div class="tablink" :class="{'active-tab': activeTab.query, 'inactive-tab': !activeTab.query}" @click="openPage('query')">Query params</div>
         <div class="tablink" :class="{'active-tab': activeTab.headers, 'inactive-tab': !activeTab.headers}" @click="openPage('headers')">Headers</div>
         <div class="tablink" :class="{'active-tab': activeTab.json, 'inactive-tab': !activeTab.json}" @click="openPage('json')">JSON</div>
-        <div>&nbsp;</div>
+        <div class="error-container">{{error}}</div>
     </div>
     <div v-if="activeTab.query" id="query-params" class="tabcontent">
         <div class="params-row" v-for="(param, index) in paramsLocal" :key="index">
@@ -25,13 +25,15 @@
     </div>
 
     <div v-if="activeTab.json" id="json" class="tabcontent">
-        JSON
+        <codemirror v-model="dataBody" :options="cmOptions" ref="cmEditor"></codemirror>
     </div>
   </div>
 </template>
 
 <script>
 
+import { codemirror } from 'vue-codemirror';
+import 'codemirror/lib/codemirror.css';
 const _ = require("lodash");
 
 export default {
@@ -45,7 +47,17 @@ export default {
                 json: false
             },
             paramsLocal: [],
-            headersLocal: []
+            headersLocal: [],
+            cmOptions: {
+                tabSize: 2,
+                mode: {name: "javascript", json: true},
+                theme: 'base16-dark',
+                lineNumbers: true,
+                line: true,
+            },
+            dataBody: '',
+            error: '',
+            jsonValue: null
         }
     },
     props: {
@@ -58,7 +70,21 @@ export default {
             default: () => {[]}
         }
     },
+    components: {
+        codemirror
+    },
     watch: {
+        dataBody(newVal) {
+            this.jsonValue = null;
+            this.error="";
+            try {
+                // try to parse
+                this.jsonValue = JSON.parse(newVal);
+            }
+            catch(e) { 
+                this.error = e.message;
+            }
+        },
         params: {
             immediate: true,
             handler(paramsFromProps) {
@@ -143,15 +169,18 @@ export default {
         border-bottom: 2px solid #dee2e6;
         box-shadow: none;
     }
-    div {
+    .error-container {
         width: calc(100% - 450px);
         border-bottom: 2px solid #dee2e6;
+        padding: 15px 10px;
+        color: red;
     }
+
 }
 .tabcontent {
     border: 2px solid #dee2e6;
     border-top: none;
-    max-height: calc(100% - 90px);
+    max-height: 200px;
     overflow: auto;
     .params-row, .headers-row {
         width: 100%;

@@ -14,13 +14,12 @@
             </div>
             <tab-section :params="params_array" :headers="headers_array" @attrs-change="handleAttrsChange" @delete-row="handleRowDeletion" @insert-row="handleRowInsertion" />
         </form>
-        <response-section :headersContent="responseHeaders" :responseDetails="responseDetails" :responseBody="responseData ? colorize(JSON.stringify(responseData, null, 2)) : ''"/>
+        <response-section :headersContent="responseHeaders" :responseDetails="responseDetails" :responseBody="responseData ? JSON.stringify(responseData, null, 2) : ''"/>
       </div>
 </template>
 <script>
 import TabSection from "./TabSection";
 import ResponseSection from "./ResponseSection";
-import axios from "axios";
 import prettyBytes from 'pretty-bytes';
 const _ = require("lodash");
 
@@ -51,7 +50,7 @@ export default {
     methods: {
         handleSubmit() {
             const startTime = new Date().getTime();
-            axios({
+            this.$axios({
                 url: this.request_url, // https://get.geojs.io/v1/ip/country.json?ip=8.8.8.8
                 method: this.request_type,
                 params: this.paramsObject,

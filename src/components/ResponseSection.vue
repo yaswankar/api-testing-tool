@@ -25,7 +25,7 @@
 </template>
 
 <script>
-// import setupEditors from "./EditorSetup/index";
+
 import { codemirror } from 'vue-codemirror';
 import 'codemirror/lib/codemirror.css';
 
@@ -38,14 +38,12 @@ export default {
                 headers: false,
             },
             cmOptions: {
-                // codemirror options
                 tabSize: 2,
                 readOnly: true,
                 mode: {name: "javascript", json: true},
                 theme: 'base16-dark',
                 lineNumbers: true,
                 line: true,
-                // more codemirror options, 更多 codemirror 的高级配置...
             }
         }
     },
@@ -66,15 +64,6 @@ export default {
     components: {
         codemirror
     },
-    watch: {
-        // responseBody: {
-        //     handler(newVal) {
-        //         // const {updateResponseEditor} = setupEditors();
-        //         // updateResponseEditor(newVal);
-        //     },
-        //     deep: true
-        // }
-    },
     computed: {
         getHeaders() {
             return this.headersContent;
@@ -91,7 +80,7 @@ export default {
 
 <style lang="scss" scoped>
 .response-main {
-    margin-top: 5%;
+    margin-top: 1.5%;
     .response-nav-tabs {
         display: flex;
         width: 100%;
