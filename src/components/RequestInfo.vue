@@ -12,7 +12,7 @@
             <input class="standard-input url-input" required type="URL" v-model="request_url" placeholder="https://www.example.com"/>
             <button type="submit" class="btn btn-primary submit-btn">SUBMIT</button>
             </div>
-            <tab-section :params="params_array" :headers="headers_array" @attrs-change="handleAttrsChange" @delete-row="handleRowDeletion" @insert-row="handleRowInsertion" />
+            <tab-section :params="params_array" :headers="headers_array" @attrs-change="handleAttrsChange" @json-input="updateJsonInput" @delete-row="handleRowDeletion" @insert-row="handleRowInsertion" />
         </form>
         <response-section :headersContent="responseHeaders" :responseDetails="responseDetails" :responseBody="responseData ? JSON.stringify(responseData, null, 2) : ''"/>
       </div>
@@ -33,6 +33,7 @@ export default {
             headers_array: [],
             paramsObject: {},
             headersObject: {},
+            dataInput: {},
             responseHeaders: {},
             responseDetails: {},
             responseData: null
@@ -50,16 +51,31 @@ export default {
     methods: {
         handleSubmit() {
             const startTime = new Date().getTime();
-            this.$axios({
-                url: this.request_url, // https://get.geojs.io/v1/ip/country.json?ip=8.8.8.8
-                method: this.request_type,
-                params: this.paramsObject,
-                headers: this.headersObject
-            }).then(response => {
-                this.updateResponseHeaders(response.headers);
-                this.updateResponseDetails(response, startTime);
-                this.responseData = response.data;
-            }).catch(e => e.response);
+            if(this.request_type === 'GET') {
+                this.$axios({
+                    url: this.request_url, // https://get.geojs.io/v1/ip/country.json?ip=8.8.8.8
+                    method: 'GET',
+                    params: this.paramsObject,
+                    headers: this.headersObject,
+                    // data: this.dataInput
+                }).then(response => {
+                    this.updateResponseHeaders(response.headers);
+                    this.updateResponseDetails(response, startTime);
+                    this.responseData = response.data;
+                }).catch(e => e.response);
+            } else {
+                this.$axios({
+                    url: this.request_url,
+                    method: this.request_type,
+                    params: this.paramsObject,
+                    headers: this.headersObject,
+                    data: this.dataInput
+                }).then(response => {
+                    this.updateResponseHeaders(response.headers);
+                    this.updateResponseDetails(response, startTime);
+                    this.responseData = response.data;
+                }).catch(e => e.response);
+            }
         },
         updateResponseHeaders(headers) {
             this.responseHeaders = headers;
@@ -88,11 +104,14 @@ export default {
                     if(param.key !== '') this.paramsObject[param.key] = param.value;            
                 });
             } else {
-                this.headersObject = {};
+                this.headersObject = {'Access-Control-Allow-Origin': '*'};
                 this[args.page].forEach(header => {
                     if(header.key !== '') this.headersObject[header.key] = header.value;            
                 });
             }
+        },
+        updateJsonInput(newVal) {
+            this.dataInput = newVal;
         }
     }
 }

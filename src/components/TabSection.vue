@@ -80,6 +80,7 @@ export default {
             try {
                 // try to parse
                 this.jsonValue = JSON.parse(newVal);
+                this.$emit('json-input', this.jsonValue);
             }
             catch(e) { 
                 this.error = e.message;
